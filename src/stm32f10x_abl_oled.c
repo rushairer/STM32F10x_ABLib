@@ -153,6 +153,7 @@ void OLED_Device_Init(
     GPIO_InitStructure.GPIO_Pin   = GPIO_SCL_Pin | GPIO_SDA_Pin;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOx, &GPIO_InitStructure);
+    GPIO_SetBits(GPIOx, GPIO_SCL_Pin | GPIO_SDA_Pin);
 
     I2C_DeInit(I2Cx);
     I2C_InitTypeDef I2C_InitStructure;
@@ -278,7 +279,7 @@ void OLED_DrawLine(OLED_InitTypeDef *Oledx, uint8_t X1, uint8_t Y1, uint8_t X2, 
     }
 }
 
-void OLED_ShowChar(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, char Char, uint8_t Size, uint8_t Color)
+void OLED_ShowChar(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, char Char, OLED_Font_Size Size, uint8_t Color)
 {
     uint8_t temp, i, j;
     uint8_t y0 = Y;
@@ -335,7 +336,7 @@ uint32_t OLED_Pow(OLED_InitTypeDef *Oledx, uint32_t X, uint32_t Y)
     return Result;
 }
 
-void OLED_ShowString(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, char *String, uint8_t Size, uint8_t Color)
+void OLED_ShowString(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, char *String, OLED_Font_Size Size, uint8_t Color)
 {
     uint8_t i, width;
 
