@@ -53,9 +53,11 @@ void OLED_SetPixel(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, uint8_t Color)
 void OLED_SetByte(OLED_InitTypeDef *Oledx, uint8_t Line, uint8_t Column, uint8_t Data, uint8_t Color);
 void OLED_DrawLine(OLED_InitTypeDef *Oledx, uint8_t X1, uint8_t Y1, uint8_t X2, uint8_t Y2, uint8_t Color);
 
-void OLED_ShowChar(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, char Char, uint8_t Size, uint8_t Color);
+void OLED_ShowChar(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, char Char, OLED_Font_Size Size, uint8_t Color);
 void OLED_ShowString(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, char *String, OLED_Font_Size Size, uint8_t Color);
 void OLED_ShowNumber(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, uint32_t Number, uint8_t Length, OLED_Font_Size Size, uint8_t Color);
+void OLED_ShowHexNumber(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, uint32_t Number, uint8_t Length, OLED_Font_Size Size, uint8_t Color);
+void OLED_ShowBinNumber(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, uint32_t Number, uint8_t Length, OLED_Font_Size Size, uint8_t Color);
 void OLED_DrawImage(OLED_InitTypeDef *Oledx, uint8_t X1, uint8_t Y1, uint8_t X2, uint8_t Y2, const uint8_t BMP[]);
 
 void Oled1_Init(OLED_InitTypeDef *Oledx);

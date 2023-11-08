@@ -311,7 +311,7 @@ void OLED_ShowChar(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, char Char, OLE
     }
 }
 
-uint8_t OLED_FontWidth(OLED_InitTypeDef *Oledx, uint8_t Size)
+uint8_t OLED_FontWidth(OLED_InitTypeDef *Oledx, OLED_Font_Size Size)
 {
     uint8_t width;
     switch (Size) {
@@ -347,12 +347,36 @@ void OLED_ShowString(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, char *String
     }
 }
 
-void OLED_ShowNumber(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, uint32_t Number, uint8_t Length, uint8_t Size, uint8_t Color)
+void OLED_ShowNumber(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, uint32_t Number, uint8_t Length, OLED_Font_Size Size, uint8_t Color)
 {
     uint8_t i, width;
     width = OLED_FontWidth(Oledx, Size);
     for (i = 0; i < Length; i++) {
         OLED_ShowChar(Oledx, X + i * width, Y, Number / OLED_Pow(Oledx, 10, Length - i - 1) % 10 + '0', Size, Color);
+    }
+}
+
+void OLED_ShowHexNumber(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, uint32_t Number, uint8_t Length, OLED_Font_Size Size, uint8_t Color)
+{
+    uint8_t i, width, SingleNumber;
+    width = OLED_FontWidth(Oledx, Size);
+
+    for (i = 0; i < Length; i++) {
+        SingleNumber = Number / OLED_Pow(Oledx, 16, Length - i - 1) % 16;
+        if (SingleNumber < 10) {
+            OLED_ShowChar(Oledx, X + i * width, Y, SingleNumber + '0', Size, Color);
+        } else {
+            OLED_ShowChar(Oledx, X + i * width, Y, SingleNumber - 10 + 'A', Size, Color);
+        }
+    }
+}
+
+void OLED_ShowBinNumber(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, uint32_t Number, uint8_t Length, OLED_Font_Size Size, uint8_t Color)
+{
+    uint8_t i, width;
+    width = OLED_FontWidth(Oledx, Size);
+    for (i = 0; i < Length; i++) {
+        OLED_ShowChar(Oledx, X + i * width, Y, Number / OLED_Pow(Oledx, 2, Length - i - 1) % 2 + '0', Size, Color);
     }
 }
 
