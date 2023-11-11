@@ -33,17 +33,17 @@ void KEY4X4_Init(
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_R, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_C, ENABLE);
 
-    GPIO_InitTypeDef GPIO_InitStructure_R;
-    GPIO_InitStructure_R.GPIO_Mode  = GPIO_Mode_Out_PP;
-    GPIO_InitStructure_R.GPIO_Pin   = GPIO_Pin_R1 | GPIO_Pin_R2 | GPIO_Pin_R3 | GPIO_Pin_R4;
-    GPIO_InitStructure_R.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOx_R, &GPIO_InitStructure_R);
+    GPIO_InitTypeDef GPIO_InitStruct_R;
+    GPIO_InitStruct_R.GPIO_Mode  = GPIO_Mode_Out_PP;
+    GPIO_InitStruct_R.GPIO_Pin   = GPIO_Pin_R1 | GPIO_Pin_R2 | GPIO_Pin_R3 | GPIO_Pin_R4;
+    GPIO_InitStruct_R.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOx_R, &GPIO_InitStruct_R);
 
-    GPIO_InitTypeDef GPIO_InitStructure_C;
-    GPIO_InitStructure_C.GPIO_Mode  = GPIO_Mode_IPU;
-    GPIO_InitStructure_C.GPIO_Pin   = GPIO_Pin_C1 | GPIO_Pin_C2 | GPIO_Pin_C3 | GPIO_Pin_C4;
-    GPIO_InitStructure_C.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOx_C, &GPIO_InitStructure_C);
+    GPIO_InitTypeDef GPIO_InitStruct_C;
+    GPIO_InitStruct_C.GPIO_Mode  = GPIO_Mode_IPU;
+    GPIO_InitStruct_C.GPIO_Pin   = GPIO_Pin_C1 | GPIO_Pin_C2 | GPIO_Pin_C3 | GPIO_Pin_C4;
+    GPIO_InitStruct_C.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOx_C, &GPIO_InitStruct_C);
 
     GPIO_ResetBits(GPIOx_R, GPIO_Pin_R1 | GPIO_Pin_R2 | GPIO_Pin_R3 | GPIO_Pin_R4);
 }

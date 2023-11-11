@@ -101,23 +101,23 @@ void PCA9685_Init(
     RCC_APB1PeriphClockCmd(RCC_APB1Periph, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph, ENABLE);
 
-    GPIO_InitTypeDef GPIO_InitStructure;
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF_OD;
-    GPIO_InitStructure.GPIO_Pin   = GPIO_SCL_Pin | GPIO_SDA_Pin;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOx, &GPIO_InitStructure);
+    GPIO_InitTypeDef GPIO_InitStruct;
+    GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_AF_OD;
+    GPIO_InitStruct.GPIO_Pin   = GPIO_SCL_Pin | GPIO_SDA_Pin;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOx, &GPIO_InitStruct);
     GPIO_SetBits(GPIOx, GPIO_SCL_Pin | GPIO_SDA_Pin);
 
     I2C_DeInit(I2Cx);
-    I2C_InitTypeDef I2C_InitStructure;
-    I2C_InitStructure.I2C_Ack                 = I2C_Ack_Enable;
-    I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
-    I2C_InitStructure.I2C_ClockSpeed          = 400000;
-    I2C_InitStructure.I2C_DutyCycle           = I2C_DutyCycle_2;
-    I2C_InitStructure.I2C_Mode                = I2C_Mode_I2C;
-    I2C_InitStructure.I2C_OwnAddress1         = 0x77;
+    I2C_InitTypeDef I2C_InitStruct;
+    I2C_InitStruct.I2C_Ack                 = I2C_Ack_Enable;
+    I2C_InitStruct.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
+    I2C_InitStruct.I2C_ClockSpeed          = 400000;
+    I2C_InitStruct.I2C_DutyCycle           = I2C_DutyCycle_2;
+    I2C_InitStruct.I2C_Mode                = I2C_Mode_I2C;
+    I2C_InitStruct.I2C_OwnAddress1         = 0x77;
 
-    I2C_Init(I2Cx, &I2C_InitStructure);
+    I2C_Init(I2Cx, &I2C_InitStruct);
     I2C_Cmd(I2Cx, ENABLE);
     Delay_ms(800);
 

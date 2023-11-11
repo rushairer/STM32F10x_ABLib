@@ -1,5 +1,5 @@
-#ifndef __STM32F10x_ABL_KEY_H
-#define __STM32F10x_ABL_KEY_H
+#ifndef __STM32F10X_ABL_KEY_H
+#define __STM32F10X_ABL_KEY_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,7 +15,7 @@ typedef struct
 } KEY_InitTypeDef;
 
 void KEY_Init(
-    KEY_InitTypeDef *Ledx,
+    KEY_InitTypeDef *Keyx,
     uint32_t RCC_APB2Periph,
     GPIO_TypeDef *GPIOx,
     uint16_t GPIO_Pin);

@@ -1,5 +1,5 @@
-#ifndef __STM32F10x_ABL_I2C_SOFT_H
-#define __STM32F10x_ABL_I2C_SOFT_H
+#ifndef __STM32F10X_ABL_I2C_SOFT_H
+#define __STM32F10X_ABL_I2C_SOFT_H
 
 #ifdef __cplusplus
 extern "C" {

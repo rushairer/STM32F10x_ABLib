@@ -1,5 +1,5 @@
-#ifndef __STM32F10x_ABL_LED_H
-#define __STM32F10x_ABL_LED_H
+#ifndef __STM32F10X_ABL_LED_H
+#define __STM32F10X_ABL_LED_H
 
 #ifdef __cplusplus
 extern "C" {

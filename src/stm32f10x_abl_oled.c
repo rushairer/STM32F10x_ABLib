@@ -4,6 +4,7 @@
 #include "stm32f10x_i2c.h"
 #include <stdlib.h>
 #include <string.h>
+#include "stm32f10x_abl_common.h"
 
 void OLED_WriteCommand(OLED_InitTypeDef *Oledx, uint8_t Command)
 {
@@ -148,23 +149,23 @@ void OLED_Device_Init(
     RCC_APB1PeriphClockCmd(RCC_APB1Periph, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph, ENABLE);
 
-    GPIO_InitTypeDef GPIO_InitStructure;
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF_OD;
-    GPIO_InitStructure.GPIO_Pin   = GPIO_SCL_Pin | GPIO_SDA_Pin;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOx, &GPIO_InitStructure);
+    GPIO_InitTypeDef GPIO_InitStruct;
+    GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_AF_OD;
+    GPIO_InitStruct.GPIO_Pin   = GPIO_SCL_Pin | GPIO_SDA_Pin;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOx, &GPIO_InitStruct);
     GPIO_SetBits(GPIOx, GPIO_SCL_Pin | GPIO_SDA_Pin);
 
     I2C_DeInit(I2Cx);
-    I2C_InitTypeDef I2C_InitStructure;
-    I2C_InitStructure.I2C_Ack                 = I2C_Ack_Enable;
-    I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
-    I2C_InitStructure.I2C_ClockSpeed          = 400000;
-    I2C_InitStructure.I2C_DutyCycle           = I2C_DutyCycle_2;
-    I2C_InitStructure.I2C_Mode                = I2C_Mode_I2C;
-    I2C_InitStructure.I2C_OwnAddress1         = 0x30;
+    I2C_InitTypeDef I2C_InitStruct;
+    I2C_InitStruct.I2C_Ack                 = I2C_Ack_Enable;
+    I2C_InitStruct.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
+    I2C_InitStruct.I2C_ClockSpeed          = 400000;
+    I2C_InitStruct.I2C_DutyCycle           = I2C_DutyCycle_2;
+    I2C_InitStruct.I2C_Mode                = I2C_Mode_I2C;
+    I2C_InitStruct.I2C_OwnAddress1         = 0x30;
 
-    I2C_Init(I2Cx, &I2C_InitStructure);
+    I2C_Init(I2Cx, &I2C_InitStruct);
     I2C_Cmd(I2Cx, ENABLE);
 
     Delay_ms(800);
@@ -327,15 +328,6 @@ uint8_t OLED_FontWidth(OLED_InitTypeDef *Oledx, OLED_Font_Size Size)
     return width;
 }
 
-uint32_t OLED_Pow(OLED_InitTypeDef *Oledx, uint32_t X, uint32_t Y)
-{
-    uint32_t Result = 1;
-    while (Y--) {
-        Result *= X;
-    }
-    return Result;
-}
-
 void OLED_ShowString(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, char *String, OLED_Font_Size Size, uint8_t Color)
 {
     uint8_t i, width;
@@ -352,7 +344,7 @@ void OLED_ShowNumber(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, uint32_t Num
     uint8_t i, width;
     width = OLED_FontWidth(Oledx, Size);
     for (i = 0; i < Length; i++) {
-        OLED_ShowChar(Oledx, X + i * width, Y, Number / OLED_Pow(Oledx, 10, Length - i - 1) % 10 + '0', Size, Color);
+        OLED_ShowChar(Oledx, X + i * width, Y, Number / STM32F10X_ABL_Pow(10, Length - i - 1) % 10 + '0', Size, Color);
     }
 }
 
@@ -362,7 +354,7 @@ void OLED_ShowHexNumber(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, uint32_t 
     width = OLED_FontWidth(Oledx, Size);
 
     for (i = 0; i < Length; i++) {
-        SingleNumber = Number / OLED_Pow(Oledx, 16, Length - i - 1) % 16;
+        SingleNumber = Number / STM32F10X_ABL_Pow(16, Length - i - 1) % 16;
         if (SingleNumber < 10) {
             OLED_ShowChar(Oledx, X + i * width, Y, SingleNumber + '0', Size, Color);
         } else {
@@ -376,7 +368,7 @@ void OLED_ShowBinNumber(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, uint32_t 
     uint8_t i, width;
     width = OLED_FontWidth(Oledx, Size);
     for (i = 0; i < Length; i++) {
-        OLED_ShowChar(Oledx, X + i * width, Y, Number / OLED_Pow(Oledx, 2, Length - i - 1) % 2 + '0', Size, Color);
+        OLED_ShowChar(Oledx, X + i * width, Y, Number / STM32F10X_ABL_Pow(2, Length - i - 1) % 2 + '0', Size, Color);
     }
 }
 
