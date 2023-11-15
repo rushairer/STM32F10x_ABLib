@@ -58,7 +58,7 @@ void NRF24L01_Init(
         ;
 }
 
-uint8_t NRF24L01_ReadAndWrite_Reg(NRF24L01_InitTypeDef *Nrf24l01, uint8_t Address, uint8_t Value)
+uint8_t NRF24L01_Write_Reg(NRF24L01_InitTypeDef *Nrf24l01, uint8_t Address, uint8_t Value)
 {
     uint8_t Status;
 
@@ -77,21 +77,19 @@ uint8_t NRF24L01_Read_Reg(NRF24L01_InitTypeDef *Nrf24l01, uint8_t Address)
     SPI_Soft_StartWrite(Nrf24l01->SPIx);
     SPI_Soft_SwapByte(Nrf24l01->SPIx, Address);
 
-    // TODO: NRF24L01_CMD_REGISTER_R or NRF24L01_CMD_NOP
     Value = SPI_Soft_SwapByte(Nrf24l01->SPIx, NRF24L01_CMD_REGISTER_R);
     SPI_Soft_StopWrite(Nrf24l01->SPIx);
 
     return Value;
 }
 
-uint8_t NRF24L01_Read_Buf(NRF24L01_InitTypeDef *Nrf24l01, uint8_t Address, uint8_t *Buf, uint8_t Len)
+uint8_t NRF24L01_Read_RegBuf(NRF24L01_InitTypeDef *Nrf24l01, uint8_t Address, uint8_t *Buf, uint8_t Len)
 {
     uint8_t Status, i;
 
     SPI_Soft_StartWrite(Nrf24l01->SPIx);
     Status = SPI_Soft_SwapByte(Nrf24l01->SPIx, Address);
     for (i = 0; i < Len; i++) {
-        // TODO: NRF24L01_CMD_REGISTER_R or NRF24L01_CMD_NOP
         Buf[i] = SPI_Soft_SwapByte(Nrf24l01->SPIx, NRF24L01_CMD_REGISTER_R);
     }
 
@@ -100,7 +98,7 @@ uint8_t NRF24L01_Read_Buf(NRF24L01_InitTypeDef *Nrf24l01, uint8_t Address, uint8
     return Status;
 }
 
-uint8_t NRF24L01_Write_Buf(NRF24L01_InitTypeDef *Nrf24l01, uint8_t Address, uint8_t *Buf, uint8_t Len)
+uint8_t NRF24L01_Write_RegBuf(NRF24L01_InitTypeDef *Nrf24l01, uint8_t Address, uint8_t *Buf, uint8_t Len)
 {
     uint8_t Status, i;
 
@@ -119,13 +117,13 @@ void NRF24L01_RxMode(NRF24L01_InitTypeDef *Nrf24l01)
 {
     NRF24L01_WriteCE(Nrf24l01, Bit_RESET);
 
-    NRF24L01_Write_Buf(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_RX_ADDR_P0, (uint8_t *)TX_ADDRESS, NRF24L01_ADDR_WIDTH);
-    NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_EN_AA, 0x01);           // Enable Auto.Ack:Pipe0
-    NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_EN_RXADDR, 0x01);       // Enable Pipe0
-    NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_RF_CH, NRF24L01_RF_CH); // Select RF channel
-    NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_RX_PW_P0, NRF24L01_PLOAD_WIDTH);
-    NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_RF_SETUP, 0x07);
-    NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_CONFIG, 0x0F); // Set PWR_UP bit, enable CRC(2 bytes) & Prim:RX. RX_DR enabled..
+    NRF24L01_Write_RegBuf(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_RX_ADDR_P0, (uint8_t *)TX_ADDRESS, NRF24L01_ADDR_WIDTH);
+    NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_EN_AA, 0x01);           // Enable Auto.Ack:Pipe0
+    NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_EN_RXADDR, 0x01);       // Enable Pipe0
+    NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_RF_CH, NRF24L01_RF_CH); // Select RF channel
+    NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_RX_PW_P0, NRF24L01_PLOAD_WIDTH);
+    NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_RF_SETUP, 0x07);
+    NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_CONFIG, 0x0F); // Set PWR_UP bit, enable CRC(2 bytes) & Prim:RX. RX_DR enabled..
 
     NRF24L01_WriteCE(Nrf24l01, Bit_SET);
 }
@@ -134,15 +132,15 @@ void NRF24L01_TxMode(NRF24L01_InitTypeDef *Nrf24l01)
 {
     NRF24L01_WriteCE(Nrf24l01, Bit_RESET);
 
-    NRF24L01_Write_Buf(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_TX_ADDR, (uint8_t *)TX_ADDRESS, NRF24L01_ADDR_WIDTH);
-    NRF24L01_Write_Buf(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_RX_ADDR_P0, (uint8_t *)TX_ADDRESS, NRF24L01_ADDR_WIDTH);
+    NRF24L01_Write_RegBuf(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_TX_ADDR, (uint8_t *)TX_ADDRESS, NRF24L01_ADDR_WIDTH);
+    NRF24L01_Write_RegBuf(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_RX_ADDR_P0, (uint8_t *)TX_ADDRESS, NRF24L01_ADDR_WIDTH);
 
-    NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_EN_AA, 0x01);     // Enable Auto.Ack:Pipe0
-    NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_EN_RXADDR, 0x01); // Enable Pipe0
-    NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_SETUP_RETR, 0x1A);
-    NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_RF_CH, NRF24L01_RF_CH); // Select RF channel
-    NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_RF_SETUP, 0x07);        // AT+RATE=2 传输速率 1
-    NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_CONFIG, 0x0E);          // Set PWR_UP bit, enable CRC(2 bytes) & Prim:RX. RX_DR enabled..
+    NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_EN_AA, 0x01);     // Enable Auto.Ack:Pipe0
+    NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_EN_RXADDR, 0x01); // Enable Pipe0
+    NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_SETUP_RETR, 0x1A);
+    NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_RF_CH, NRF24L01_RF_CH); // Select RF channel
+    NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_RF_SETUP, 0x07);        // AT+RATE=2 传输速率 1
+    NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_CONFIG, 0x0E);          // Set PWR_UP bit, enable CRC(2 bytes) & Prim:RX. RX_DR enabled..
 
     NRF24L01_WriteCE(Nrf24l01, Bit_SET);
 }
@@ -156,8 +154,8 @@ uint8_t NRF24L01_Check(NRF24L01_InitTypeDef *Nrf24l01)
     SPI_Soft_WriteCSN(Nrf24l01->SPIx, Bit_SET);
     NRF24L01_WriteCE(Nrf24l01, Bit_RESET);
 
-    NRF24L01_Write_Buf(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_TX_ADDR, check_in_buf, NRF24L01_ADDR_WIDTH);
-    NRF24L01_Read_Buf(Nrf24l01, NRF24L01_CMD_REGISTER_R + NRF24L01_REG_TX_ADDR, check_out_buf, NRF24L01_ADDR_WIDTH);
+    NRF24L01_Write_RegBuf(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_TX_ADDR, check_in_buf, NRF24L01_ADDR_WIDTH);
+    NRF24L01_Read_RegBuf(Nrf24l01, NRF24L01_CMD_REGISTER_R + NRF24L01_REG_TX_ADDR, check_out_buf, NRF24L01_ADDR_WIDTH);
 
     if ((check_out_buf[0] == 0x11) && (check_out_buf[1] == 0x22) && (check_out_buf[2] == 0x33) && (check_out_buf[3] == 0x44) && (check_out_buf[4] == 0x55)) {
         return 0;
@@ -175,12 +173,12 @@ uint8_t NRF24L01_GetRxBuf(NRF24L01_InitTypeDef *Nrf24l01, uint8_t *Buf)
 {
     uint8_t State;
     State = NRF24L01_Read_Reg(Nrf24l01, NRF24L01_REG_STATUS);
-    NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_STATUS, State);
+    NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_STATUS, State);
     if (State & NRF24L01_FLAG_RX_DREADY) {
         NRF24L01_WriteCE(Nrf24l01, Bit_SET);
 
-        NRF24L01_Read_Buf(Nrf24l01, NRF24L01_CMD_RX_PLOAD_R, Buf, NRF24L01_PLOAD_WIDTH);
-        NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_FLUSH_RX, NRF24L01_CMD_NOP);
+        NRF24L01_Read_RegBuf(Nrf24l01, NRF24L01_CMD_RX_PLOAD_R, Buf, NRF24L01_PLOAD_WIDTH);
+        NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_FLUSH_RX, NRF24L01_CMD_NOP);
 
         NRF24L01_WriteCE(Nrf24l01, Bit_SET);
         Delay_us(150);
@@ -194,14 +192,14 @@ uint8_t NRF24L01_SendTxBuf(NRF24L01_InitTypeDef *Nrf24l01, uint8_t *Buf)
     uint8_t State;
 
     NRF24L01_WriteCE(Nrf24l01, Bit_RESET);
-    NRF24L01_Write_Buf(Nrf24l01, NRF24L01_CMD_TX_PLOAD_W, Buf, NRF24L01_PLOAD_WIDTH);
+    NRF24L01_Write_RegBuf(Nrf24l01, NRF24L01_CMD_TX_PLOAD_W, Buf, NRF24L01_PLOAD_WIDTH);
     NRF24L01_WriteCE(Nrf24l01, Bit_SET);
     while (NRF24L01_ReadIRQ(Nrf24l01) == 1)
         ;
     State = NRF24L01_Read_Reg(Nrf24l01, NRF24L01_REG_STATUS);
-    NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_STATUS, State);
+    NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_REGISTER_W + NRF24L01_REG_STATUS, State);
     if (State & NRF24L01_FLAG_MAX_RT) {
-        NRF24L01_ReadAndWrite_Reg(Nrf24l01, NRF24L01_CMD_FLUSH_TX, NRF24L01_CMD_NOP);
+        NRF24L01_Write_Reg(Nrf24l01, NRF24L01_CMD_FLUSH_TX, NRF24L01_CMD_NOP);
         return NRF24L01_FLAG_MAX_RT;
     }
     if (State & NRF24L01_FLAG_TX_DSENT) {

@@ -82,7 +82,7 @@ extern "C" {
 
 #define NRF24L01_ADDR_WIDTH   5  // RX/TX address width
 #define NRF24L01_PLOAD_WIDTH  32 // Payload width
-#define NRF24L01_RF_CH        56
+#define NRF24L01_RF_CH        56 // 2.456 -> 0111000
 
 typedef struct {
     SPI_Soft_InitTypeDef *SPIx;
@@ -102,10 +102,10 @@ void NRF24L01_Init(
     uint16_t GPIO_CE_Pin);
 
 uint8_t NRF24L01_Check(NRF24L01_InitTypeDef *Nrf24l01);
-uint8_t NRF24L01_ReadAndWrite_Reg(NRF24L01_InitTypeDef *Nrf24l01, uint8_t Address, uint8_t Value);
+uint8_t NRF24L01_Write_Reg(NRF24L01_InitTypeDef *Nrf24l01, uint8_t Address, uint8_t Value);
 uint8_t NRF24L01_Read_Reg(NRF24L01_InitTypeDef *Nrf24l01, uint8_t Address);
-uint8_t NRF24L01_Read_Buf(NRF24L01_InitTypeDef *Nrf24l01, uint8_t Address, uint8_t *Buf, uint8_t Len);
-uint8_t NRF24L01_Write_Buf(NRF24L01_InitTypeDef *Nrf24l01, uint8_t Address, uint8_t *Buf, uint8_t Len);
+uint8_t NRF24L01_Read_RegBuf(NRF24L01_InitTypeDef *Nrf24l01, uint8_t Address, uint8_t *Buf, uint8_t Len);
+uint8_t NRF24L01_Write_RegBuf(NRF24L01_InitTypeDef *Nrf24l01, uint8_t Address, uint8_t *Buf, uint8_t Len);
 
 void NRF24L01_RxMode(NRF24L01_InitTypeDef *Nrf24l01);
 void NRF24L01_TxMode(NRF24L01_InitTypeDef *Nrf24l01);
