@@ -1,6 +1,8 @@
 #include "stm32f10x_abl_nrf24l01.h"
 #include "stm32f10x_abl_delay.h"
 #include <stdio.h>
+#include <math.h>
+#include <string.h>
 
 void NRF24L01_WriteCE(NRF24L01_InitTypeDef *Nrf24l01, BitAction BitVal)
 {
@@ -206,4 +208,78 @@ uint8_t NRF24L01_SendTxBuf(NRF24L01_InitTypeDef *Nrf24l01, uint8_t *Buf)
         return NRF24L01_FLAG_TX_DSENT;
     }
     return NRF24L01_CMD_NOP;
+}
+
+void NRF24L01_SendNumber(NRF24L01_InitTypeDef *Nrf24l01, uint32_t Num)
+{
+    uint8_t SendBuf[11] = {0};
+    SendBuf[0]          = 10;
+    for (uint8_t i = 0; i < 10; i++) {
+        SendBuf[i + 1] = Num / (uint32_t)pow(10, 9 - i) % 10;
+    }
+
+    NRF24L01_SendTxBuf(Nrf24l01, SendBuf);
+}
+
+uint32_t NRF24L01_GetNumber(NRF24L01_InitTypeDef *Nrf24l01)
+{
+    uint32_t Num    = 0;
+    uint8_t Buf[32] = {0};
+    NRF24L01_GetRxBuf(Nrf24l01, Buf);
+    for (uint16_t i = 0; i < 10; i++) {
+        Num += Buf[i + 1] * pow(10, 9 - i);
+    }
+
+    return Num;
+}
+
+void NRF24L01_SendString(NRF24L01_InitTypeDef *Nrf24l01, char *String)
+{
+    uint8_t SizeOfBuf   = strlen(String);
+    uint8_t SendBuf[32] = {0};
+    uint8_t SendIndex   = 0;
+
+    for (uint8_t i = 0; i < SizeOfBuf; i++) {
+        SendIndex++;
+        SendBuf[0]         = SendIndex;
+        SendBuf[SendIndex] = String[i];
+
+        if (i == SizeOfBuf - 1 || String[i] == 0 || SendIndex >= 31) {
+            NRF24L01_SendTxBuf(Nrf24l01, SendBuf);
+            SendIndex = 0;
+        }
+    }
+}
+
+void NRF24L01_GetString(NRF24L01_InitTypeDef *Nrf24l01, char *String)
+{
+    memset(String, 0, 32);
+    uint8_t Buf[32] = {0};
+    NRF24L01_GetRxBuf(Nrf24l01, Buf);
+    uint8_t Len = Buf[0];
+
+    for (uint8_t i = 0; i < Len; i++) {
+        String[i] = Buf[i + 1];
+    }
+}
+
+void NRF24L01_GetStringWithoutSuffix(NRF24L01_InitTypeDef *Nrf24l01, char *String)
+{
+    memset(String, 0, 32);
+    uint8_t Buf[32] = {0};
+    NRF24L01_GetRxBuf(Nrf24l01, Buf);
+    uint8_t Len = Buf[0];
+
+    for (uint8_t i = 0; i < Len; i++) {
+        String[i] = Buf[i + 1];
+        if (i + 3 <= Len && Buf[i + 2] == '\r' && Buf[i + 3] == '\n') {
+            break;
+        }
+    }
+}
+
+// TODO:
+uint8_t NRF24L01_ReceiveData(NRF24L01_InitTypeDef *Nrf24l01, uint8_t *Data)
+{
+    return 0;
 }

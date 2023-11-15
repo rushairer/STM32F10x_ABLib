@@ -4,7 +4,7 @@
 #include "stm32f10x_i2c.h"
 #include <stdlib.h>
 #include <string.h>
-#include "stm32f10x_abl_common.h"
+#include <math.h>
 
 void OLED_WriteCommand(OLED_InitTypeDef *Oledx, uint8_t Command)
 {
@@ -344,7 +344,7 @@ void OLED_ShowNumber(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, uint32_t Num
     uint8_t i, width;
     width = OLED_FontWidth(Oledx, Size);
     for (i = 0; i < Length; i++) {
-        OLED_ShowChar(Oledx, X + i * width, Y, Number / STM32F10X_ABL_Pow(10, Length - i - 1) % 10 + '0', Size, Color);
+        OLED_ShowChar(Oledx, X + i * width, Y, Number / (uint32_t)pow(10, Length - i - 1) % 10 + '0', Size, Color);
     }
 }
 
@@ -354,7 +354,7 @@ void OLED_ShowHexNumber(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, uint32_t 
     width = OLED_FontWidth(Oledx, Size);
 
     for (i = 0; i < Length; i++) {
-        SingleNumber = Number / STM32F10X_ABL_Pow(16, Length - i - 1) % 16;
+        SingleNumber = Number / (uint32_t)pow(16, Length - i - 1) % 16;
         if (SingleNumber < 10) {
             OLED_ShowChar(Oledx, X + i * width, Y, SingleNumber + '0', Size, Color);
         } else {
@@ -368,7 +368,7 @@ void OLED_ShowBinNumber(OLED_InitTypeDef *Oledx, uint8_t X, uint8_t Y, uint32_t 
     uint8_t i, width;
     width = OLED_FontWidth(Oledx, Size);
     for (i = 0; i < Length; i++) {
-        OLED_ShowChar(Oledx, X + i * width, Y, Number / STM32F10X_ABL_Pow(2, Length - i - 1) % 2 + '0', Size, Color);
+        OLED_ShowChar(Oledx, X + i * width, Y, Number / (uint32_t)pow(2, Length - i - 1) % 2 + '0', Size, Color);
     }
 }
 

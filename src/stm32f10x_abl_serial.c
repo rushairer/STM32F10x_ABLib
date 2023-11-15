@@ -1,5 +1,5 @@
 #include "stm32f10x_abl_serial.h"
-#include "stm32f10x_abl_common.h"
+#include <math.h>
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -110,7 +110,7 @@ void SERIAL_SendNumber(SERIAL_InitTypeDef *Serialx, uint32_t Number, uint8_t Len
 {
     uint8_t i;
     for (i = 0; i < Length; i++) {
-        SERIAL_SendByte(Serialx, Number / STM32F10X_ABL_Pow(10, Length - i - 1) % 10 + '0');
+        SERIAL_SendByte(Serialx, Number / (uint32_t)pow(10, Length - i - 1) % 10 + '0');
     }
 }
 

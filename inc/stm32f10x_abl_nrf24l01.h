@@ -91,9 +91,6 @@ typedef struct {
     GPIO_TypeDef *GPIOx;
     uint16_t GPIO_IRQ_Pin;
     uint16_t GPIO_CE_Pin;
-
-    uint8_t RX_BUF[NRF24L01_PLOAD_WIDTH];
-    uint8_t TX_BUF[NRF24L01_PLOAD_WIDTH];
 } NRF24L01_InitTypeDef;
 
 void NRF24L01_Init(
@@ -116,6 +113,13 @@ void NRF24L01_TxMode(NRF24L01_InitTypeDef *Nrf24l01);
 uint8_t NRF24L01_Get_Value_Flag(NRF24L01_InitTypeDef *Nrf24l01);
 uint8_t NRF24L01_GetRxBuf(NRF24L01_InitTypeDef *Nrf24l01, uint8_t *Buf);
 uint8_t NRF24L01_SendTxBuf(NRF24L01_InitTypeDef *Nrf24l01, uint8_t *Buf);
+void NRF24L01_SendNumber(NRF24L01_InitTypeDef *Nrf24l01, uint32_t Num);
+uint32_t NRF24L01_GetNumber(NRF24L01_InitTypeDef *Nrf24l01);
+void NRF24L01_SendString(NRF24L01_InitTypeDef *Nrf24l01, char *String);
+void NRF24L01_GetString(NRF24L01_InitTypeDef *Nrf24l01, char *String);
+void NRF24L01_GetStringWithoutSuffix(NRF24L01_InitTypeDef *Nrf24l01, char *String);
+
+uint8_t NRF24L01_ReceiveData(NRF24L01_InitTypeDef *Nrf24l01, uint8_t *Data);
 
 void Nrf24l011_Init(NRF24L01_InitTypeDef *Nrf24l01, SPI_Soft_InitTypeDef *SPIx);
 
