@@ -7,16 +7,25 @@ extern "C" {
 
 #include "stm32f10x.h"
 
-#define PAGE_SIZE        (0x400)   /* 1 Kbyte */
-#define FLASH_SIZE       (0x20000) /* 128 KBytes */
+#define PAGE_SIZE           (0x400)   /* 1 Kbyte */
+#define FLASH_SIZE          (0x20000) /* 128 KBytes */
 
-#define FILE_NAME_LENGTH (256)
-#define FILE_SIZE_LENGTH (16)
+#define FILE_NAME_LENGTH    (256)
+#define FILE_SIZE_LENGTH    (16)
 
-#define IAP_Connector    void *
+#define IS_AF(c)            ((c >= 'A') && (c <= 'F'))
+#define IS_af(c)            ((c >= 'a') && (c <= 'f'))
+#define IS_09(c)            ((c >= '0') && (c <= '9'))
+#define ISVALIDHEX(c)       IS_AF(c) || IS_af(c) || IS_09(c)
+#define ISVALIDDEC(c)       IS_09(c)
+#define CONVERTDEC(c)       (c - '0')
+#define CONVERTHEX_alpha(c) (IS_AF(c) ? (c - 'A' + 10) : (c - 'a' + 10))
+#define CONVERTHEX(c)       (IS_09(c) ? (c - '0') : CONVERTHEX_alpha(c))
+
+#define IAP_Connector       void *
 typedef void (*pIAPExecuteApplicationFunction)(void);
 typedef uint8_t (*pIAPReceiveDataFunction)(IAP_Connector, uint8_t *);
-typedef void (*pIAPOutputStringFunction)(IAP_Connector, char *);
+typedef void (*pIAPOutputDataFunction)(IAP_Connector, char *);
 
 typedef enum {
     IAP_COMMAND_ANY                = 0x00,
@@ -35,7 +44,7 @@ typedef struct {
     uint32_t FlashProtection;
     IAP_Connector Connector;
     pIAPReceiveDataFunction ReceiveData;
-    pIAPOutputStringFunction OutputString;
+    pIAPOutputDataFunction OutputString;
 
     uint32_t FlashDestination;
     uint32_t RamSource;
@@ -48,7 +57,7 @@ void IAP_Init(
     uint32_t ApplicationAddress,
     IAP_Connector Connector,
     pIAPReceiveDataFunction ReceiveData,
-    pIAPOutputStringFunction OutputString);
+    pIAPOutputDataFunction OutputString);
 
 void IAP_ShowMenu(IAP_InitTypeDef *IAPx);
 int8_t IAP_Download(IAP_InitTypeDef *IAPx);

@@ -126,7 +126,7 @@ void IAP_Init(
     uint32_t ApplicationAddress,
     IAP_Connector Connector,
     pIAPReceiveDataFunction ReceiveData,
-    pIAPOutputStringFunction OutputString)
+    pIAPOutputDataFunction OutputString)
 {
     IAPx->ApplicationAddress = ApplicationAddress;
     IAPx->Connector          = Connector;

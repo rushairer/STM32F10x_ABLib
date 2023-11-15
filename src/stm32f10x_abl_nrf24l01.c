@@ -276,8 +276,17 @@ void NRF24L01_GetStringWithoutSuffix(NRF24L01_InitTypeDef *Nrf24l01, char *Strin
     }
 }
 
-// TODO:
 uint8_t NRF24L01_ReceiveData(NRF24L01_InitTypeDef *Nrf24l01, uint8_t *Data)
 {
+    NRF24L01_RxMode(Nrf24l01);
+    Delay_ms(10);
+    // TODO:
+
     return 0;
+}
+
+void NRF24L01_SendData(NRF24L01_InitTypeDef *Nrf24l01, uint8_t *Data)
+{
+    NRF24L01_TxMode(Nrf24l01);
+    Delay_ms(10);
 }

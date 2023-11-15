@@ -120,6 +120,7 @@ void NRF24L01_GetString(NRF24L01_InitTypeDef *Nrf24l01, char *String);
 void NRF24L01_GetStringWithoutSuffix(NRF24L01_InitTypeDef *Nrf24l01, char *String);
 
 uint8_t NRF24L01_ReceiveData(NRF24L01_InitTypeDef *Nrf24l01, uint8_t *Data);
+void NRF24L01_SendData(NRF24L01_InitTypeDef *Nrf24l01, uint8_t *Data);
 
 void Nrf24l011_Init(NRF24L01_InitTypeDef *Nrf24l01, SPI_Soft_InitTypeDef *SPIx);
 
