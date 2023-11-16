@@ -24,7 +24,7 @@ extern "C" {
 
 #define IAP_Connector       void *
 typedef void (*pIAPExecuteApplicationFunction)(void);
-typedef uint8_t (*pIAPReceiveDataFunction)(IAP_Connector, uint8_t *);
+typedef uint8_t (*pIAPYmodemReceiveDataFunction)(IAP_Connector, uint8_t *);
 typedef void (*pIAPOutputDataFunction)(IAP_Connector, char *);
 
 typedef enum {
@@ -43,7 +43,7 @@ typedef struct {
     uint32_t UserMemoryMask;
     uint32_t FlashProtection;
     IAP_Connector Connector;
-    pIAPReceiveDataFunction ReceiveData;
+    pIAPYmodemReceiveDataFunction ReceiveData;
     pIAPOutputDataFunction OutputString;
 
     uint32_t FlashDestination;
@@ -56,7 +56,7 @@ void IAP_Init(
     IAP_InitTypeDef *IAPx,
     uint32_t ApplicationAddress,
     IAP_Connector Connector,
-    pIAPReceiveDataFunction ReceiveData,
+    pIAPYmodemReceiveDataFunction ReceiveData,
     pIAPOutputDataFunction OutputString);
 
 void IAP_ShowMenu(IAP_InitTypeDef *IAPx);
@@ -64,7 +64,7 @@ int8_t IAP_Download(IAP_InitTypeDef *IAPx);
 uint8_t IAP_Execute(IAP_InitTypeDef *IAPx);
 
 void IAP_SendByte(IAP_InitTypeDef *IAPx, uint8_t Byte);
-void IAP_OutputString(IAP_InitTypeDef *IAPx, char *String);
+void IAP_OutputData(IAP_InitTypeDef *IAPx, char *String);
 int8_t IAP_ReceiveDatat(IAP_InitTypeDef *IAPx, uint8_t *Data);
 
 #ifdef __cplusplus

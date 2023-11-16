@@ -14,3 +14,8 @@ void Led3_Init(LED_InitTypeDef *Ledx)
 {
     LED_Init(Ledx, RCC_APB2Periph_GPIOA, GPIOA, GPIO_Pin_3);
 }
+
+void LedDefault_Init(LED_InitTypeDef *Ledx)
+{
+    LED_Init(Ledx, RCC_APB2Periph_GPIOC, GPIOC, GPIO_Pin_13);
+}

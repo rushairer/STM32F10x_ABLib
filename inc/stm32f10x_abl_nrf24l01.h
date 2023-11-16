@@ -77,12 +77,9 @@ extern "C" {
 #define NRF24L01_MASK_PLOS_CNT   0xF0 // Mask for PLOS_CNT[7:4] bits in OBSERVE_TX register
 #define NRF24L01_MASK_ARC_CNT    0x0F // Mask for ARC_CNT[3:0] bits in OBSERVE_TX register
 
-// Register masks definitions
-#define NRF24L01_MASK_REG_MAP 0x1F // Mask bits[4:0] for CMD_RREG and CMD_WREG commands
-
-#define NRF24L01_ADDR_WIDTH   5  // RX/TX address width
-#define NRF24L01_PLOAD_WIDTH  32 // Payload width
-#define NRF24L01_RF_CH        56 // 2.456 -> 0111000
+#define NRF24L01_ADDR_WIDTH      5  // RX/TX address width
+#define NRF24L01_PLOAD_WIDTH     32 // Payload width
+#define NRF24L01_RF_CH           56 // 2.456 -> 0111000
 
 typedef struct {
     SPI_Soft_InitTypeDef *SPIx;
@@ -119,7 +116,6 @@ void NRF24L01_SendString(NRF24L01_InitTypeDef *Nrf24l01, char *String);
 void NRF24L01_GetString(NRF24L01_InitTypeDef *Nrf24l01, char *String);
 void NRF24L01_GetStringWithoutSuffix(NRF24L01_InitTypeDef *Nrf24l01, char *String);
 
-uint8_t NRF24L01_ReceiveData(NRF24L01_InitTypeDef *Nrf24l01, uint8_t *Data);
 void NRF24L01_SendData(NRF24L01_InitTypeDef *Nrf24l01, uint8_t *Data);
 
 void Nrf24l011_Init(NRF24L01_InitTypeDef *Nrf24l01, SPI_Soft_InitTypeDef *SPIx);

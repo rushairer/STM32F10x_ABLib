@@ -28,6 +28,7 @@ void LED_Toggle(LED_InitTypeDef *Ledx);
 void Led1_Init(LED_InitTypeDef *Ledx);
 void Led2_Init(LED_InitTypeDef *Ledx);
 void Led3_Init(LED_InitTypeDef *Ledx);
+void LedDefault_Init(LED_InitTypeDef *Ledx);
 
 #ifdef __cplusplus
 }

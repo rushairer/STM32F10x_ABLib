@@ -125,7 +125,7 @@ void IAP_Init(
     IAP_InitTypeDef *IAPx,
     uint32_t ApplicationAddress,
     IAP_Connector Connector,
-    pIAPReceiveDataFunction ReceiveData,
+    pIAPYmodemReceiveDataFunction ReceiveData,
     pIAPOutputDataFunction OutputString)
 {
     IAPx->ApplicationAddress = ApplicationAddress;
@@ -156,16 +156,16 @@ void IAP_Init(
 
 void IAP_ShowMenu(IAP_InitTypeDef *IAPx)
 {
-    IAP_OutputString(IAPx, "\r\n========================= Main Menu ======================\r\n");
-    IAP_OutputString(IAPx, "\r\n  Download Image To the STM32F10x Internal Flash ------- 1\r\n");
-    IAP_OutputString(IAPx, "\r\n  Upload Image From the STM32F10x Internal Flash ------- 2\r\n");
-    IAP_OutputString(IAPx, "\r\n  Execute The New Program ------------------------------ 3\r\n");
+    IAP_OutputData(IAPx, "\r\n========================= Main Menu ======================\r\n");
+    IAP_OutputData(IAPx, "\r\n  Download Image To the STM32F10x Internal Flash ------- 1\r\n");
+    IAP_OutputData(IAPx, "\r\n  Upload Image From the STM32F10x Internal Flash ------- 2\r\n");
+    IAP_OutputData(IAPx, "\r\n  Execute The New Program ------------------------------ 3\r\n");
 
     if (IAPx->FlashProtection != 0) {
-        IAP_OutputString(IAPx, "\r\n  Disable the write protection ------------------------- 4\r\n");
+        IAP_OutputData(IAPx, "\r\n  Disable the write protection ------------------------- 4\r\n");
     }
 
-    IAP_OutputString(IAPx, "\r\n==========================================================\r\n");
+    IAP_OutputData(IAPx, "\r\n==========================================================\r\n");
 }
 
 uint8_t IAP_ErasePages(IAP_InitTypeDef *IAPx, __IO uint32_t Size, uint8_t OutPutCont)
@@ -183,8 +183,8 @@ uint8_t IAP_ErasePages(IAP_InitTypeDef *IAPx, __IO uint32_t Size, uint8_t OutPut
         FLASHStatus = FLASH_ErasePage(IAPx->ApplicationAddress + (PAGE_SIZE * EraseCounter));
         if (OutPutCont == 1) {
             Int2Str(EraseCont, EraseCounter + 1);
-            IAP_OutputString(IAPx, (char *)EraseCont);
-            IAP_OutputString(IAPx, "@");
+            IAP_OutputData(IAPx, (char *)EraseCont);
+            IAP_OutputData(IAPx, "@");
         }
     }
     FLASH_Lock();
@@ -200,25 +200,25 @@ int8_t IAP_Download(IAP_InitTypeDef *IAPx)
     int32_t Size       = 0;
     Size               = IAP_ReceiveDatat(IAPx, &(IAPx->Tab1024)[0]);
     if (Size > 0) {
-        IAP_OutputString(IAPx, "\r\n Update Over!\r\n");
-        IAP_OutputString(IAPx, " Name: ");
-        IAP_OutputString(IAPx, (char *)IAPx->FileName);
+        IAP_OutputData(IAPx, "\r\nUpdate Over!\r\n");
+        IAP_OutputData(IAPx, " Name: ");
+        IAP_OutputData(IAPx, (char *)IAPx->FileName);
         Int2Str(Number, Size);
-        IAP_OutputString(IAPx, "\r\n Size: ");
-        IAP_OutputString(IAPx, (char *)Number);
-        IAP_OutputString(IAPx, " Bytes.\r\n");
+        IAP_OutputData(IAPx, "\r\nSize: ");
+        IAP_OutputData(IAPx, (char *)Number);
+        IAP_OutputData(IAPx, " Bytes.\r\n");
         return 0;
     } else if (Size == -1) {
-        IAP_OutputString(IAPx, "\r\n Image Too Big!\r\n");
+        IAP_OutputData(IAPx, "\r\nImage Too Big!\r\n");
         return -1;
     } else if (Size == -2) {
-        IAP_OutputString(IAPx, "\r\n Update failed!\r\n");
+        IAP_OutputData(IAPx, "\r\nUpdate failed!\r\n");
         return -2;
     } else if (Size == -3) {
-        IAP_OutputString(IAPx, "\r\n Aborted by user.\r\n");
+        IAP_OutputData(IAPx, "\r\nAborted by user.\r\n");
         return -3;
     } else {
-        IAP_OutputString(IAPx, " Receive Filed.\r\n");
+        IAP_OutputData(IAPx, "Receive Filed.\r\n");
         return -4;
     }
 }
@@ -230,11 +230,11 @@ uint8_t IAP_Execute(IAP_InitTypeDef *IAPx)
         IAPx->ExecuteApplication = (pIAPExecuteApplicationFunction)IAPx->ExecuteAddress;
         __set_MSP(*(__IO uint32_t *)IAPx->ApplicationAddress);
         IAPx->ExecuteApplication();
-        IAP_OutputString(IAPx, "\r\nExecuting...\r\n");
+        IAP_OutputData(IAPx, "\r\nExecuting...\r\n");
 
         return 1;
     } else {
-        IAP_OutputString(IAPx, "\r\nExecute Failed!\r\n");
+        IAP_OutputData(IAPx, "\r\nExecute Failed!\r\n");
         return 0;
     }
 }
@@ -244,7 +244,7 @@ int8_t IAP_ReceiveDatat(IAP_InitTypeDef *IAPx, uint8_t *Data)
     return IAPx->ReceiveData(IAPx->Connector, Data);
 }
 
-void IAP_OutputString(IAP_InitTypeDef *IAPx, char *String)
+void IAP_OutputData(IAP_InitTypeDef *IAPx, char *String)
 {
     IAPx->OutputString(IAPx->Connector, String);
 }
