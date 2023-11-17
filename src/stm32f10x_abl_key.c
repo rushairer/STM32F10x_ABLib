@@ -24,9 +24,9 @@ uint8_t KEY_IsPressed(KEY_InitTypeDef *Keyx)
 {
     uint8_t isPressed = 0;
 
-    if (GPIO_ReadInputDataBit(Keyx->GPIOx, Keyx->GPIO_Pin) == 0) {
+    if (GPIO_ReadInputDataBit(Keyx->GPIOx, Keyx->GPIO_Pin) == RESET) {
         Delay_ms(20);
-        while (GPIO_ReadInputDataBit(Keyx->GPIOx, Keyx->GPIO_Pin) == 0)
+        while (GPIO_ReadInputDataBit(Keyx->GPIOx, Keyx->GPIO_Pin) == RESET)
             ;
         Delay_ms(20);
         isPressed = 1;

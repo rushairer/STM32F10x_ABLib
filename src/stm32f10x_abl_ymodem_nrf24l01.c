@@ -20,24 +20,35 @@ uint8_t NRF24L01_YmodemReceiveDataPackage(NRF24L01_InitTypeDef *Nrf24l01, uint8_
 {
     NRF24L01_RxMode(Nrf24l01);
     Delay_ms(100);
+    uint8_t Buf[2048]   = {0};
+    uint8_t TempBuf[32] = {0};
 
+    uint32_t theIndex = 0;
     if (!NRF24L01_Get_Value_Flag(Nrf24l01)) {
-        while (1) {
-            NRF24L01_GetRxBuf(Nrf24l01, Data);
+        while (theIndex < 2048) {
+            memset(TempBuf, 1, 32);
+            NRF24L01_GetRxBuf(Nrf24l01, TempBuf);
             // Delay_ms(10);
             // NRF24L01_SendByte(Nrf24l01, CRC16);
             // NRF24L01_SendTxBuf(Nrf24l01, Data);
 
-            if (strlen((char *)Data) > 100) {
-                printf((char *)Data);
-                return 1;
-            } else {
-                // NRF24L01_SendByte(Nrf24l01, CRC16);
-
-                return 0;
+            for (uint8_t i = 0; i < TempBuf[0]; i++) {
+                Buf[theIndex] = TempBuf[i + 1];
+                theIndex++;
             }
+
+            Data = Buf;
+            // if (strlen((char *)Data) > 500) {
+            //     printf((char *)Data);
+            //     return 1;
+            // } else {
+            //     // NRF24L01_SendByte(Nrf24l01, CRC16);
+
+            //     // return 0;
+            // }
         }
 
+        return 1;
     } else {
         NRF24L01_SendByte(Nrf24l01, CRC16);
         return 0;
