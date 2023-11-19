@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 
 void SERIAL_Init(
     SERIAL_InitTypeDef *Serialx,
@@ -20,6 +21,9 @@ void SERIAL_Init(
     Serialx->GPIO_Tx_Pin          = GPIO_Tx_Pin;
     Serialx->GPIO_Rx_Pin          = GPIO_Rx_Pin;
     Serialx->BaudRate             = BaudRate;
+    Serialx->RxFlag               = 0;
+
+    memset(&(Serialx->RxData), 0, 128);
 
     uint8_t NVIC_IRQChannelx;
 
@@ -43,6 +47,7 @@ void SERIAL_Init(
     }
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_PIN, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 
     GPIO_InitTypeDef GPIO_InitStruct;
     GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_AF_PP;
@@ -50,7 +55,7 @@ void SERIAL_Init(
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOx, &GPIO_InitStruct);
 
-    GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_IPU;
+    GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_IN_FLOATING;
     GPIO_InitStruct.GPIO_Pin   = GPIO_Rx_Pin;
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOx, &GPIO_InitStruct);
@@ -66,15 +71,6 @@ void SERIAL_Init(
 
     USART_ITConfig(USARTx, USART_IT_RXNE, ENABLE);
     USART_Cmd(USARTx, ENABLE);
-
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-
-    NVIC_InitTypeDef NVIC_InitStruct;
-    NVIC_InitStruct.NVIC_IRQChannel                   = NVIC_IRQChannelx;
-    NVIC_InitStruct.NVIC_IRQChannelCmd                = ENABLE;
-    NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 1;
-    NVIC_InitStruct.NVIC_IRQChannelSubPriority        = 1;
-    NVIC_Init(&NVIC_InitStruct);
 }
 
 void SERIAL_SendByte(SERIAL_InitTypeDef *Serialx, uint8_t Byte)
