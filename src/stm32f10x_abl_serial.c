@@ -21,28 +21,19 @@ void SERIAL_Init(
     Serialx->GPIO_Tx_Pin          = GPIO_Tx_Pin;
     Serialx->GPIO_Rx_Pin          = GPIO_Rx_Pin;
     Serialx->BaudRate             = BaudRate;
-    Serialx->RxFlag               = 0;
-
-    memset(&(Serialx->RxData), 0, 128);
-
-    uint8_t NVIC_IRQChannelx;
 
     switch (RCC_APBxPeriph_USART) {
         case RCC_APB2Periph_USART1:
             RCC_APB2PeriphClockCmd(RCC_APBxPeriph_USART, ENABLE);
-            NVIC_IRQChannelx = USART1_IRQn;
             break;
         case RCC_APB1Periph_USART2:
             RCC_APB1PeriphClockCmd(RCC_APBxPeriph_USART, ENABLE);
-            NVIC_IRQChannelx = USART2_IRQn;
             break;
         case RCC_APB1Periph_USART3:
             RCC_APB1PeriphClockCmd(RCC_APBxPeriph_USART, ENABLE);
-            NVIC_IRQChannelx = USART3_IRQn;
             break;
         default:
             RCC_APB1PeriphClockCmd(RCC_APBxPeriph_USART, ENABLE);
-            NVIC_IRQChannelx = USART3_IRQn;
             break;
     }
 
@@ -130,44 +121,4 @@ void SERIAL_Printf(SERIAL_InitTypeDef *Serialx, char *format, ...)
     vsprintf(String, format, arg);
     va_end(arg);
     SERIAL_SendString(Serialx, String);
-}
-
-uint8_t SERIAL_GetRxFlag(SERIAL_InitTypeDef *Serialx)
-{
-    if (Serialx->RxFlag == 1) {
-        Serialx->RxFlag = 0;
-        return 1;
-    }
-    return 0;
-}
-
-void SERIAL_IRQHandler(SERIAL_InitTypeDef *Serialx)
-{
-    static uint8_t RxState   = 0;
-    static uint8_t pRxPacket = 0;
-    if (USART_GetITStatus(Serialx->USARTx, USART_IT_RXNE) == SET) {
-        uint8_t RxData = USART_ReceiveData(Serialx->USARTx);
-
-        if (RxState == 0) {
-            if (RxData == '@' && Serialx->RxFlag == 0) {
-                RxState   = 1;
-                pRxPacket = 0;
-            }
-        } else if (RxState == 1) {
-            if (RxData == '\r') {
-                RxState = 2;
-            } else {
-                Serialx->RxData[pRxPacket] = RxData;
-                pRxPacket++;
-            }
-        } else if (RxState == 2) {
-            if (RxData == '\n') {
-                RxState                    = 0;
-                Serialx->RxData[pRxPacket] = '\0';
-                Serialx->RxFlag            = 1;
-            }
-        }
-
-        USART_ClearITPendingBit(Serialx->USARTx, USART_IT_RXNE);
-    }
 }

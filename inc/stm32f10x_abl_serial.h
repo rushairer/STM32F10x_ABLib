@@ -18,9 +18,6 @@ typedef struct {
 
     uint32_t BaudRate;
 
-    uint8_t RxData[128];
-    uint8_t RxFlag;
-
 } SERIAL_InitTypeDef;
 
 void SERIAL_Init(
@@ -40,8 +37,6 @@ void SERIAL_SendString(SERIAL_InitTypeDef *Serialx, char *String);
 void SERIAL_SendNumber(SERIAL_InitTypeDef *Serialx, uint32_t Number, uint8_t Length);
 void SERIAL_SendData(SERIAL_InitTypeDef *Serialx, uint8_t *Array, uint16_t Length);
 void SERIAL_Printf(SERIAL_InitTypeDef *Serialx, char *format, ...);
-uint8_t SERIAL_GetRxFlag(SERIAL_InitTypeDef *Serialx);
-void SERIAL_IRQHandler(SERIAL_InitTypeDef *Serialx);
 
 void Serial1_Init(SERIAL_InitTypeDef *Serialx);
 void Serial2_Init(SERIAL_InitTypeDef *Serialx);
