@@ -1,85 +1,6 @@
 #include "stm32f10x_abl_iap.h"
+#include "stm32f10x_abl_strings.h"
 #include <string.h>
-
-uint32_t Str2Int(uint8_t *inputstr, int32_t *intnum)
-{
-    uint32_t i = 0, res = 0;
-    uint32_t val = 0;
-
-    if (inputstr[0] == '0' && (inputstr[1] == 'x' || inputstr[1] == 'X')) {
-        if (inputstr[2] == '\0') {
-            return 0;
-        }
-        for (i = 2; i < 11; i++) {
-            if (inputstr[i] == '\0') {
-                *intnum = val;
-                /* return 1; */
-                res = 1;
-                break;
-            }
-            if (ISVALIDHEX(inputstr[i])) {
-                val = (val << 4) + CONVERTHEX(inputstr[i]);
-            } else {
-                /* return 0, Invalid input */
-                res = 0;
-                break;
-            }
-        }
-        /* over 8 digit hex --invalid */
-        if (i >= 11) {
-            res = 0;
-        }
-    } else /* max 10-digit decimal input */
-    {
-        for (i = 0; i < 11; i++) {
-            if (inputstr[i] == '\0') {
-                *intnum = val;
-                /* return 1 */
-                res = 1;
-                break;
-            } else if ((inputstr[i] == 'k' || inputstr[i] == 'K') && (i > 0)) {
-                val     = val << 10;
-                *intnum = val;
-                res     = 1;
-                break;
-            } else if ((inputstr[i] == 'm' || inputstr[i] == 'M') && (i > 0)) {
-                val     = val << 20;
-                *intnum = val;
-                res     = 1;
-                break;
-            } else if (ISVALIDDEC(inputstr[i])) {
-                val = val * 10 + CONVERTDEC(inputstr[i]);
-            } else {
-                /* return 0, Invalid input */
-                res = 0;
-                break;
-            }
-        }
-        /* Over 10 digit decimal --invalid */
-        if (i >= 11) {
-            res = 0;
-        }
-    }
-
-    return res;
-}
-
-void Int2Str(uint8_t *str, int32_t intnum)
-{
-    uint32_t i, Div = 1000000000, j = 0, Status = 0;
-
-    for (i = 0; i < 10; i++) {
-        str[j++] = (intnum / Div) + 48;
-
-        intnum = intnum % Div;
-        Div /= 10;
-        if ((str[j - 1] == '0') & (Status == 0)) {
-            j = 0;
-        } else {
-            Status++;
-        }
-    }
-}
 
 uint32_t FLASH_PagesMask(__IO uint32_t Size)
 {
@@ -96,15 +17,13 @@ uint32_t FLASH_PagesMask(__IO uint32_t Size)
 
 void IAP_Init(
     IAP_InitTypeDef *IAPx,
-    uint32_t ApplicationAddress,
-    IAP_Connector Connector,
-    pIAPYmodemReceiveDataFunction ReceiveData,
-    pIAPOutputDataFunction OutputString)
+    SERIAL_InitTypeDef *Serial,
+    uint32_t ApplicationAddress)
 {
+    IAPx->Serial             = Serial;
     IAPx->ApplicationAddress = ApplicationAddress;
-    IAPx->Connector          = Connector;
-    IAPx->ReceiveData        = ReceiveData;
-    IAPx->OutputString       = OutputString;
+
+    YMODEM_Init(IAPx->Ymodem, Serial, FLASH_SIZE, (pYmodemErasePageFunction)IAP_ErasePages, (pYmodemSaveApplicationDataFunction)IAP_SaveApplicationData);
 
     memset(&(IAPx->Tab1024), 0, 1024);
 
@@ -155,7 +74,7 @@ uint8_t IAP_ErasePages(IAP_InitTypeDef *IAPx, __IO uint32_t Size, uint8_t OutPut
     for (EraseCounter = 0; (EraseCounter < NbrOfPage) && (FLASHStatus == FLASH_COMPLETE); EraseCounter++) {
         FLASHStatus = FLASH_ErasePage(IAPx->ApplicationAddress + (PAGE_SIZE * EraseCounter));
         if (OutPutCont == 1) {
-            Int2Str(EraseCont, EraseCounter + 1);
+            STRINGS_Int2Str(EraseCounter + 1, EraseCont);
             IAP_OutputData(IAPx, (char *)EraseCont);
             IAP_OutputData(IAPx, "@");
         }
@@ -163,6 +82,22 @@ uint8_t IAP_ErasePages(IAP_InitTypeDef *IAPx, __IO uint32_t Size, uint8_t OutPut
     FLASH_Lock();
     if ((EraseCounter != NbrOfPage) || (FLASHStatus != FLASH_COMPLETE)) {
         return 0;
+    }
+    return 1;
+}
+
+uint8_t IAP_SaveApplicationData(IAP_InitTypeDef *IAPx, uint32_t PacketLength, uint32_t Size, uint32_t RamSource)
+{
+    for (uint8_t j = 0; (j < PacketLength) && (IAPx->FlashDestination < IAPx->ApplicationAddress + Size); j += 4) {
+        /* Program the data received into STM32F10x Flash */
+        FLASH_Unlock();
+        FLASH_ProgramWord(IAPx->FlashDestination, *(uint32_t *)RamSource);
+        FLASH_Lock();
+        if (*(uint32_t *)IAPx->FlashDestination != *(uint32_t *)RamSource) {
+            return 0;
+        }
+        IAPx->FlashDestination += 4;
+        RamSource += 4;
     }
     return 1;
 }
@@ -176,7 +111,7 @@ int8_t IAP_Download(IAP_InitTypeDef *IAPx)
         IAP_OutputData(IAPx, "\r\nUpdate Over!\r\n");
         IAP_OutputData(IAPx, " Name: ");
         IAP_OutputData(IAPx, (char *)IAPx->FileName);
-        Int2Str(Number, Size);
+        STRINGS_Int2Str(Size, Number);
         IAP_OutputData(IAPx, "\r\nSize: ");
         IAP_OutputData(IAPx, (char *)Number);
         IAP_OutputData(IAPx, " Bytes.\r\n");
@@ -212,12 +147,16 @@ uint8_t IAP_Execute(IAP_InitTypeDef *IAPx)
     }
 }
 
-int8_t IAP_ReceiveDatat(IAP_InitTypeDef *IAPx, uint8_t *Data)
-{
-    return IAPx->ReceiveData(IAPx->Connector, Data);
-}
-
 void IAP_OutputData(IAP_InitTypeDef *IAPx, char *String)
 {
-    IAPx->OutputString(IAPx->Connector, String);
+    SERIAL_SendString(IAPx->Serial, String);
+}
+
+int32_t IAP_ReceiveDatat(IAP_InitTypeDef *IAPx, uint8_t *Data)
+{
+
+    IAPx->FlashDestination = IAPx->ApplicationAddress;
+
+    YMODEM_ReceiveData(IAPx->Ymodem, IAPx->FileName, Data);
+    return 0;
 }

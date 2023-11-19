@@ -10,7 +10,8 @@ void SERIAL_Init(
     uint32_t RCC_APB2Periph_PIN,
     GPIO_TypeDef *GPIOx,
     uint16_t GPIO_Tx_Pin,
-    uint16_t GPIO_Rx_Pin)
+    uint16_t GPIO_Rx_Pin,
+    uint32_t BaudRate)
 {
     Serialx->RCC_APBxPeriph_USART = RCC_APBxPeriph_USART;
     Serialx->USARTx               = USARTx;
@@ -18,6 +19,7 @@ void SERIAL_Init(
     Serialx->GPIOx                = GPIOx;
     Serialx->GPIO_Tx_Pin          = GPIO_Tx_Pin;
     Serialx->GPIO_Rx_Pin          = GPIO_Rx_Pin;
+    Serialx->BaudRate             = BaudRate;
 
     uint8_t NVIC_IRQChannelx;
 
@@ -54,7 +56,7 @@ void SERIAL_Init(
     GPIO_Init(GPIOx, &GPIO_InitStruct);
 
     USART_InitTypeDef USART_InitStruct;
-    USART_InitStruct.USART_BaudRate            = 115200;
+    USART_InitStruct.USART_BaudRate            = BaudRate;
     USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     USART_InitStruct.USART_Mode                = USART_Mode_Tx | USART_Mode_Rx;
     USART_InitStruct.USART_Parity              = USART_Parity_No;
@@ -80,6 +82,16 @@ void SERIAL_SendByte(SERIAL_InitTypeDef *Serialx, uint8_t Byte)
     USART_SendData(Serialx->USARTx, Byte);
     while (USART_GetFlagStatus(Serialx->USARTx, USART_FLAG_TXE) == RESET) {
         ;
+    }
+}
+
+uint32_t SERIAL_ReceiveByte(SERIAL_InitTypeDef *Serialx, uint8_t *Byte)
+{
+    if (USART_GetFlagStatus(Serialx->USARTx, USART_FLAG_RXNE) != RESET) {
+        *Byte = (uint8_t)Serialx->USARTx->DR;
+        return 1;
+    } else {
+        return 0;
     }
 }
 

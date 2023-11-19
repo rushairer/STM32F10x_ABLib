@@ -16,6 +16,8 @@ typedef struct {
     uint16_t GPIO_Tx_Pin;
     uint16_t GPIO_Rx_Pin;
 
+    uint32_t BaudRate;
+
     uint8_t RxData[128];
     uint8_t RxFlag;
 
@@ -28,9 +30,11 @@ void SERIAL_Init(
     uint32_t RCC_APB2Periph_PIN,
     GPIO_TypeDef *GPIOx,
     uint16_t GPIO_Tx_Pin,
-    uint16_t GPIO_Rx_Pin);
+    uint16_t GPIO_Rx_Pin,
+    uint32_t BaudRate);
 
 void SERIAL_SendByte(SERIAL_InitTypeDef *Serialx, uint8_t Byte);
+uint32_t SERIAL_ReceiveByte(SERIAL_InitTypeDef *Serialx, uint8_t *Byte);
 void SERIAL_SendArray(SERIAL_InitTypeDef *Serialx, uint8_t *Array, uint16_t Length);
 void SERIAL_SendString(SERIAL_InitTypeDef *Serialx, char *String);
 void SERIAL_SendNumber(SERIAL_InitTypeDef *Serialx, uint32_t Number, uint8_t Length);

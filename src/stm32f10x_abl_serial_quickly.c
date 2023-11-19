@@ -9,7 +9,8 @@ void Serial1_Init(SERIAL_InitTypeDef *Serialx)
         RCC_APB2Periph_GPIOA,
         GPIOA,
         GPIO_Pin_9,
-        GPIO_Pin_10);
+        GPIO_Pin_10,
+        9600);
 }
 
 void Serial2_Init(SERIAL_InitTypeDef *Serialx)
@@ -21,5 +22,6 @@ void Serial2_Init(SERIAL_InitTypeDef *Serialx)
         RCC_APB2Periph_GPIOB,
         GPIOB,
         GPIO_Pin_6,
-        GPIO_Pin_7);
+        GPIO_Pin_7,
+        9600);
 }
